@@ -1,12 +1,13 @@
 import express, { response } from "express";
 import cors from "cors";
+import bcrypt from "bcrypt";
 import 'dotenv/config'
 import './database.js';
-import { Todo } from "./models/index.js";
+import { Todo, User } from "./models/index.js";
 
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5002;
 
 // to convert body into json
 app.use(express.json());
@@ -37,18 +38,59 @@ app.get("/api/v1/todos", async(request, response) => {
 
 
 app.post("/api/v1/signup", async(request, response) => {
-    const obj = {
+    if(!request.body.name || !request.body.email || !request.body.password){
+      response.status(400).send({message: "Parameters missing"});
+      return
+    }
+
+    const user = await User.findOne({email: request.body.email})
+  if (user) {
+    response.status(400).send({message: "Email already exist"});
+    return
+  }
+
+  const encryptedPassword = await bcrypt.hash(request.body.password, 10)
+
+  // console.log('encryptedPassword', encryptedPassword);
+  
+
+    const result = await User.create({
       name: request.body.name,
       email: request.body.email,
-      password: request.body.password,
-    };
-  console.log('obj=>', obj);
-  
-    // const result = await Todo.create(obj)
+      password: encryptedPassword,
+    });
     
-    response.send({data:obj, message: "todo add ho gaya ha"});
+    response.send({data: result, message: "signup successfully"});
   
 });
+
+app.post("/api/v1/login", async(request, response) => {
+  // const obj = {
+  //   email: request.body.email,
+  //   password: request.body.password,
+  // };
+
+  const result = await User.findOne({email: request.body.email})
+  console.log('result', result);
+  
+  if(!result){
+  response.status(404).send({message: "user not found"});
+  return;
+  } 
+  const match = await bcrypt.compare(request.body.password, result.password);
+
+  // if (result.password !== request.body.password){
+  if (!match){
+    response.status(400).send({message: "password not match"});
+    return;
+    
+  }
+     
+  
+  response.send({message: "login successfully"});
+
+});
+
 
 app.use((request, response) => {
   response.status(404).send({ massage: "no route found!" });
