@@ -1,6 +1,9 @@
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 export default function Login() {
+  const BASE_URL = "http://localhost:5002";
+
   const formSubmitHua = async (event) => {
     try {
       event.preventDefault();
@@ -10,14 +13,12 @@ export default function Login() {
       const email = formData.get("email");
       const password = formData.get("password");
 
-      console.log("email: ", email);
-      console.log("password: ", password);
 
       const response = await axios.post(
-        "https://dummyjson.com/auth/login",
+        `${BASE_URL}/api/v1/login`,
         {
-          username: "emilys",
-          password: "emilyspass",
+          email: email,
+          password: password,
         },
         { withCredentials: true }
       );
@@ -65,7 +66,8 @@ export default function Login() {
           Login
         </button>
         <p className="text-xs text-gray-500 mt-3">
-          Literally you probably haven't heard of them jean shorts.
+          {/* You have already an account? */}
+          not have an account? <Link to='/signup'>Signup</Link>
         </p>
       </form>
     </div>

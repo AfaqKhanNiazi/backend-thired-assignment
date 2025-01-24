@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import 'dotenv/config'
 import './database.js';
 import { Todo, User } from "./models/index.js";
-
+import jwt from "jsonwebtoken";
 
 const app = express();
 const port = process.env.PORT || 5002;
@@ -13,6 +13,7 @@ const port = process.env.PORT || 5002;
 app.use(express.json());
 app.use(
   cors({
+    credentials: true,
     origin: [
       "http://localhost:5173","https://todo-list-mongodb.surge.sh",
     ],
@@ -82,8 +83,21 @@ app.post("/api/v1/login", async(request, response) => {
     
   }
      
+  const token = jwt.sign(
+    {
+        _id: result._id,
+        email: result.email,
+    },
+    "SECRET@@##$$fdsf342fdqwf",
+    { expiresIn: "7d"}
+);
   
-  response.send({message: "login successfully"});
+  response.cookie("my-token",token,{
+    expires:
+    new Date(Date.now() + 86400000*7),
+    secure: true,httpOnly: true
+
+  }).send({message: "login successfully",});
 
 });
 

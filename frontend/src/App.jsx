@@ -10,6 +10,7 @@ import Products from "./pages/Products"
 import ProductDetail from "./pages/ProductDetail"
 import AddProduct from "./pages/AddProduct"
 import Search from "./pages/Search"
+import Signup from "./pages/signup";
 // import Signup from "./pages/signup"
 
 // import { FcAbout } from "react-icons/fc";
@@ -55,6 +56,7 @@ const isLoggedIn = false;
     ) : (
       <>
   <Route path="/login" element={<Login/>}/>
+  <Route path="/signup" element={<Signup/>}/>
   <Route path="*"element={<Navigate to="/login" />}/>
  
   </>
